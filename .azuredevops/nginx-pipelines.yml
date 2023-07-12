@@ -12,8 +12,7 @@ trigger:
   paths:
     include:
     - nginx/*
-    exclude:
-    - '*'
+
 pr:
   branches:
     include:
@@ -22,8 +21,6 @@ pr:
   paths:
     include:
     - nginx/*
-    exclude:
-    - '*'
 
 variables:
   - group: build
