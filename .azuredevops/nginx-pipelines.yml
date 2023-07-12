@@ -1,0 +1,45 @@
+name: $(image)-$(Date:yyyyMMdd)-$(Rev:r)
+
+trigger: 
+  batch: true
+  branches:
+    include:
+    - release
+    - master
+  tags:
+    exclude:
+    - '*'
+  paths:
+    include:
+    - nginx/*
+    exclude:
+    - '*'
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - nginx/*
+    exclude:
+    - '*'
+
+variables:
+  - group: build
+  - name: image
+    value: nginx
+
+pool:
+  name: Default
+
+resources:
+- repo: self
+
+jobs:
+  - job: DockerBuild
+    displayName: Build
+    workspace:
+      clean: all
+    steps:
+      - template: template/docker-pipelines.yml
+

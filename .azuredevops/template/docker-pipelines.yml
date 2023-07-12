@@ -1,0 +1,31 @@
+steps:
+  - checkout: self
+    clean: true
+    fetchTags: true
+  - task: Docker@2
+    displayName: Login
+    inputs:
+      containerRegistry: docker.io
+      command: login
+      addPipelineData: false
+      addBaseImageData: false
+  - task: Bash@3
+    displayName: 'Build'
+    inputs:
+      targetType: filePath
+      filePath: ./$(image)/build.sh
+      arguments: '--build'
+  - task: Bash@3
+    displayName: 'Test'
+    inputs:
+      targetType: filePath
+      filePath: ./$(image)/build.sh
+      arguments: '--test'
+  - task: Bash@3
+    displayName: 'Push'
+    inputs:
+      targetType: filePath
+      filePath: ./$(image)/build.sh
+      arguments: '--push'
+    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
+
