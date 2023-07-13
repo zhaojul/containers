@@ -49,7 +49,7 @@ RUN  export NGINX_VERSION='1.24.0' \
           --with-ipv6 \
           --with-pcre \
           --with-pcre-jit \
-          --add-module=modules/headers-more-nginx-module-0.33 \
+          --add-module=modules/headers-more-nginx-module-0.34 \
           --add-module=modules/nginx_http_upstream_check_module \
           --add-module=modules/nginx-limit-speed-module \
           --add-module=modules/ngx_devel_kit-0.3.1 \
@@ -118,19 +118,19 @@ RUN  export NGINX_VERSION='1.24.0' \
      && cd /usr/src/nginx-$NGINX_VERSION \
           && mkdir -p modules \
           && curl -L "http://storage.corpintra.plus/nginx/modules/lua-nginx-module-0.10.14.tar.gz" -o lua-nginx-module-0.10.14.tar.gz \
-          && curl -L "http://storage.corpintra.plus/nginx/modules/headers-more-nginx-module.tar.gz" -o headers-more-nginx-module.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/headers-more-nginx-module-0.34.tar.gz" -o headers-more-nginx-module-0.34.tar.gz \
           && curl -L "http://storage.corpintra.plus/nginx/modules/nginx-module-vts-0.1.18.tar.gz" -o nginx-module-vts-0.1.18.tar.gz \
           && curl -L "http://storage.corpintra.plus/nginx/modules/ngx_devel_kit-0.3.1.tar.gz" -o ngx_devel_kit-0.3.1.tar.gz \
           && curl -L "http://storage.corpintra.plus/nginx/modules/nginx-limit-speed-module.tar.gz" -o nginx-limit-speed-module.tar.gz \
           && curl -L "http://storage.corpintra.plus/nginx/modules/nginx_http_upstream_check_module.tar.gz" -o nginx_http_upstream_check_module.tar.gz \
           && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f lua-nginx-module-0.10.14.tar.gz \
-          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f headers-more-nginx-module.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f headers-more-nginx-module-0.34.tar.gz \
           && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx-module-vts-0.1.18.tar.gz \
           && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f ngx_devel_kit-0.3.1.tar.gz \
           && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx-limit-speed-module.tar.gz \
           && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx_http_upstream_check_module.tar.gz \
           && rm  lua-nginx-module-0.10.14.tar.gz \
-          && rm  headers-more-nginx-module.tar.gz \
+          && rm  headers-more-nginx-module-0.34.tar.gz \
           && rm  nginx-module-vts-0.1.18.tar.gz \
           && rm  ngx_devel_kit-0.3.1.tar.gz \
           && rm  nginx-limit-speed-module.tar.gz \
