@@ -28,13 +28,11 @@ fi
 docker rm -f image-test
 }
 
-
 PUSH () {
 docker push ${registry}/${repository}:${tag}
 docker push ${registry}/${repository}:${tag}-alpine
 docker push ${registry}/${repository}:latest
 }
-
 
 HELP () {
 cat << USAGE
@@ -45,7 +43,6 @@ usage:
 USAGE
 exit 0
 }
-
 
 case "${1}" in
 --build)
