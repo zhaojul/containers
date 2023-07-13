@@ -1,0 +1,37 @@
+name: $(image)-$(Date:yyyyMMdd)-$(Rev:r)
+
+trigger: 
+  batch: true
+  branches:
+    include:
+    - release
+    - master
+  tags:
+    exclude:
+    - '*'
+  paths:
+    include:
+    - tengine/*
+
+pr:
+  branches:
+    include:
+    - release
+    - master
+  paths:
+    include:
+    - tengine/*
+
+variables:
+  - group: build
+  - name: image
+    value: tengine
+
+pool:
+  name: Default
+
+resources:
+- repo: self
+
+stages:
+- template: template/docker-build-pipelines.yml
