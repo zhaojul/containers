@@ -34,7 +34,7 @@ resources:
 - repo: self
 
 stages:
-- template: .azuredevops/template/docker-build-pipelines.yml@self
+- template: ../../.azuredevops/template/docker-build-pipelines.yml
   parameters:
     BashfilePath: "library/$(image)/build.sh"
  
