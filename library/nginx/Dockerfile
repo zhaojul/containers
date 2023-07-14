@@ -1,6 +1,6 @@
-FROM alpine:3.17
+FROM alpine:3.16
 
-RUN  export NGINX_VERSION='1.24.0' \
+RUN  export NGINX_VERSION='1.22.1' \
      && export CONFIG="\
           --prefix=/etc/nginx \
           --sbin-path=/usr/sbin/nginx \
@@ -55,6 +55,7 @@ RUN  export NGINX_VERSION='1.24.0' \
           --add-module=modules/ngx_devel_kit-0.3.1 \
           --add-module=modules/lua-nginx-module-0.10.14 \
           --add-module=modules/nginx-module-vts-0.1.18 \
+          --with-ld-opt='-Wl,-rpath,/usr/local/lib' \
           " \
           && rm -rf /var/cache/apk/* \
           && rm -rf /tmp/* \
