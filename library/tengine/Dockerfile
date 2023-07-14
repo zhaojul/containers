@@ -68,6 +68,7 @@ RUN  export TENGINE_VERSION='2.3.3' \
           --add-module=modules/nginx-auth-ldap \
           --add-module=modules/lua-nginx-module-0.10.14 \
           --add-module=modules/nginx-module-vts-0.1.18 \
+          --with-ld-opt='-Wl,-rpath,/usr/local/lib' \
           " \
           && rm -rf /var/cache/apk/* \
           && rm -rf /tmp/* \
