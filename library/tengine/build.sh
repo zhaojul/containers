@@ -39,22 +39,22 @@ docker push ${registry}/${repository}:latest
 HELP () {
 cat << USAGE
 usage:
-    --build : Build images
-    --push : Push images
-    --test : Test images
+    build : Build images
+    push  : Push images
+    test  : Test images
 USAGE
 exit 0
 }
 
 
 case "${1}" in
---build)
+build)
         BUILD
         ;;
---push)
+push)
         PUSH
         ;;
---test)
+test)
         TEST
         ;;
 *)
