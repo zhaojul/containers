@@ -1,8 +1,8 @@
 stages:
 - stage: Build
   jobs:
-  - job: DockerBuild
-    displayName: DockerBuild
+  - job: Build
+    displayName: Build
     workspace:
       clean: all
     steps:
@@ -10,28 +10,29 @@ stages:
         clean: true
         fetchTags: true
       - task: Docker@2
-        displayName: Login
+        displayName: DockerLogin
         inputs:
           containerRegistry: docker.io
           command: login
           addPipelineData: false
           addBaseImageData: false
       - task: Bash@3
-        displayName: 'Build'
+        displayName: 'DockerBuild'
         inputs:
           targetType: filePath
-          filePath: ./$(image)/build.sh
-          arguments: '--build'
+          filePath: ${{ parameters.BashfilePath }}
+          arguments: 'build'
       - task: Bash@3
-        displayName: 'Test'
+        displayName: 'DockerTest'
         inputs:
           targetType: filePath
-          filePath: ./$(image)/build.sh
-          arguments: '--test'
+          filePath: ${{ parameters.BashfilePath }}
+          arguments: 'test'
       - task: Bash@3
-        displayName: 'Push'
+        displayName: 'DockerPush'
         inputs:
           targetType: filePath
-          filePath: ./$(image)/build.sh
-          arguments: '--push'
+          filePath: ${{ parameters.BashfilePath }}
+          arguments: 'push'
         condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/release'))
+

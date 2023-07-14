@@ -1,6 +1,6 @@
-FROM alpine:3.14
+FROM alpine:3.16
 
-RUN  export TENGINE_VERSION='2.3.3' \
+RUN  export NGINX_VERSION='1.22.1' \
      && export CONFIG="\
           --prefix=/etc/nginx \
           --sbin-path=/usr/sbin/nginx \
@@ -36,7 +36,6 @@ RUN  export TENGINE_VERSION='2.3.3' \
           --with-http_perl_module \
           --with-threads \
           --with-stream \
-          --with-stream_sni \
           --with-stream_ssl_module \
           --with-stream_ssl_preread_module \
           --with-stream_realip_module \
@@ -50,29 +49,18 @@ RUN  export TENGINE_VERSION='2.3.3' \
           --with-ipv6 \
           --with-pcre \
           --with-pcre-jit \
-          --with-luajit-lib=/usr/local/lib \
-          --with-luajit-inc=/usr/local/include/luajit-2.1 \
-          --with-lua-lib=/usr/local/lib \
-          --with-lua-inc=/usr/local/include \
-          --add-module=modules/headers-more-nginx-module-0.33 \
-          --add-module=modules/ngx_multi_upstream_module \
-          --add-module=modules/ngx_http_upstream_check_module \
-          --add-module=modules/ngx_http_upstream_session_sticky_module \
-          --add-module=modules/ngx_http_user_agent_module \
-          --add-module=modules/ngx_http_upstream_vnswrr_module \
+          --add-module=modules/headers-more-nginx-module-0.34 \
+          --add-module=modules/nginx_http_upstream_check_module \
           --add-module=modules/nginx-limit-speed-module \
           --add-module=modules/ngx_devel_kit-0.3.1 \
-          --add-module=modules/ngx_brotli \
-          --add-module=modules/ngx_slab_stat \
-          --add-module=modules/ngx_debug_pool \
-          --add-module=modules/nginx-auth-ldap \
           --add-module=modules/lua-nginx-module-0.10.14 \
           --add-module=modules/nginx-module-vts-0.1.18 \
+          --with-ld-opt='-Wl,-rpath,/usr/local/lib' \
           " \
           && rm -rf /var/cache/apk/* \
           && rm -rf /tmp/* \
-          && addgroup --system --gid 101 nginx \
-          && adduser --system --ingroup nginx --no-create-home --home /var/lib/nginx --gecos "Nginx web server" --shell /bin/false --uid 101 nginx \
+          && addgroup -g 101 -S nginx \
+          && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
           && sed -i 's/dl-cdn.alpinelinux.org/mirrors.cloud.tencent.com/g' /etc/apk/repositories \
           && apk add --no-cache --virtual .build-deps \
                     patch \
@@ -103,18 +91,16 @@ RUN  export TENGINE_VERSION='2.3.3' \
                     psmisc \
                     ncurses-dev \
                     libevent-dev \
-                    openldap \
-                    openldap-dev \
-          && curl -L "http://storage.corpintra.plus/tengine/release/tengine-$TENGINE_VERSION.tar.gz" -o tengine.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/lua-5.1.5.tar.gz" -o lua-5.1.5.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/luajit2-2.1-20201229.tar.gz" -o luajit2-2.1-20201229.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/lua-cjson-2.1.0.7.tar.gz" -o lua-cjson-2.1.0.7.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/release/nginx-$NGINX_VERSION.tar.gz" -o nginx.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/lua-5.1.5.tar.gz" -o lua-5.1.5.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/luajit2-2.1-20201229.tar.gz" -o luajit2-2.1-20201229.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/lua-cjson-2.1.0.7.tar.gz" -o lua-cjson-2.1.0.7.tar.gz \
           && mkdir -p /usr/src \
-          && tar -zxC /usr/src -f tengine.tar.gz \
+          && tar -zxC /usr/src -f nginx.tar.gz \
           && tar -zxC /usr/src -f lua-5.1.5.tar.gz \
           && tar -zxC /usr/src -f luajit2-2.1-20201229.tar.gz \
           && tar -zxC /usr/src -f lua-cjson-2.1.0.7.tar.gz \
-          && rm tengine.tar.gz \
+          && rm nginx.tar.gz \
           && rm lua-5.1.5.tar.gz \
           && rm luajit2-2.1-20201229.tar.gz \
           && rm lua-cjson-2.1.0.7.tar.gz \
@@ -130,29 +116,28 @@ RUN  export TENGINE_VERSION='2.3.3' \
           && export LUAJIT_INC=/usr/local/include/luajit-2.1 \
           && make -j2 \
           && make install \
-     && cd /usr/src/tengine-$TENGINE_VERSION \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/lua-nginx-module-0.10.14.tar.gz" -o lua-nginx-module-0.10.14.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/headers-more-nginx-module.tar.gz" -o headers-more-nginx-module.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/nginx-auth-ldap.tar.gz" -o nginx-auth-ldap.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/nginx-module-vts-0.1.18.tar.gz" -o nginx-module-vts-0.1.18.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/ngx_devel_kit-0.3.1.tar.gz" -o ngx_devel_kit-0.3.1.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/ngx_brotli.tar.gz" -o ngx_brotli.tar.gz \
-          && curl -L "http://storage.corpintra.plus/tengine/modules/nginx-limit-speed-module.tar.gz" -o nginx-limit-speed-module.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f lua-nginx-module-0.10.14.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f headers-more-nginx-module.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f nginx-auth-ldap.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f nginx-module-vts-0.1.18.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f ngx_devel_kit-0.3.1.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f ngx_brotli.tar.gz \
-          && tar -zxC /usr/src/tengine-$TENGINE_VERSION/modules -f nginx-limit-speed-module.tar.gz \
+     && cd /usr/src/nginx-$NGINX_VERSION \
+          && mkdir -p modules \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/lua-nginx-module-0.10.14.tar.gz" -o lua-nginx-module-0.10.14.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/headers-more-nginx-module-0.34.tar.gz" -o headers-more-nginx-module-0.34.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/nginx-module-vts-0.1.18.tar.gz" -o nginx-module-vts-0.1.18.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/ngx_devel_kit-0.3.1.tar.gz" -o ngx_devel_kit-0.3.1.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/nginx-limit-speed-module.tar.gz" -o nginx-limit-speed-module.tar.gz \
+          && curl -L "http://storage.corpintra.plus/nginx/modules/nginx_http_upstream_check_module.tar.gz" -o nginx_http_upstream_check_module.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f lua-nginx-module-0.10.14.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f headers-more-nginx-module-0.34.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx-module-vts-0.1.18.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f ngx_devel_kit-0.3.1.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx-limit-speed-module.tar.gz \
+          && tar -zxC /usr/src/nginx-$NGINX_VERSION/modules -f nginx_http_upstream_check_module.tar.gz \
           && rm  lua-nginx-module-0.10.14.tar.gz \
-          && rm  headers-more-nginx-module.tar.gz \
-          && rm  nginx-auth-ldap.tar.gz \
+          && rm  headers-more-nginx-module-0.34.tar.gz \
           && rm  nginx-module-vts-0.1.18.tar.gz \
           && rm  ngx_devel_kit-0.3.1.tar.gz \
-          && rm  ngx_brotli.tar.gz \
           && rm  nginx-limit-speed-module.tar.gz \
-     && ls -l /usr/src/tengine-$TENGINE_VERSION/modules \
+          && rm  nginx_http_upstream_check_module.tar.gz \
+          && ls -l /usr/src/nginx-$NGINX_VERSION/modules \
+     && patch -p1 < /usr/src/nginx-$NGINX_VERSION/modules/nginx_http_upstream_check_module/check_1.20.1+.patch \
      && ./configure $CONFIG \
           && make -j$(getconf _NPROCESSORS_ONLN) \
           && make install \
@@ -162,16 +147,9 @@ RUN  export TENGINE_VERSION='2.3.3' \
           && install -m644 html/50x.html /usr/share/nginx/html/50x.html \
           && strip /usr/sbin/nginx* \
           && rm -rf /usr/src \
-          \
-          # forward request and error logs to docker log collector
           && ln -sf /dev/stdout /var/log/nginx/access.log \
           && ln -sf /dev/stderr /var/log/nginx/error.log \
           && chown -Rf nginx:nginx /var/cache/nginx /var/log/nginx \
-          \
-          # Bring in gettext so we can get `envsubst`, then throw
-          # the rest away. To do this, we need to install `gettext`
-          # then move `envsubst` out of the way so `gettext` can
-          # be deleted completely, then move `envsubst` back.
           && apk add --no-cache --virtual .gettext gettext \
           && mv /usr/bin/envsubst /tmp/ \
           \
@@ -185,25 +163,18 @@ RUN  export TENGINE_VERSION='2.3.3' \
           && apk del .build-deps \
           && apk del .gettext \
           && mv /tmp/envsubst /usr/local/bin/ \
-          \
-          # Bring in tzdata so users could set the timezones through the environment
-          # variables
-          && apk add --no-cache tzdata \
-          \
-          # Bring in curl and ca-certificates to make registering on DNS SD easier
-          && apk add --no-cache curl ca-certificates \
+          && apk add --no-cache tzdata curl \
           && rm -rf /var/cache/apk/* \
           && rm -rf /root/.cache \
           && rm -rf /tmp/*
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf  /etc/nginx/conf.d/default.conf
 
-COPY default.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
 STOPSIGNAL SIGTERM
 
 CMD ["nginx", "-g", "daemon off;"]
-
 

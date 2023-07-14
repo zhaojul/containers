@@ -1,6 +1,6 @@
 name: $(image)-$(Date:yyyyMMdd)-$(Rev:r)
 
-trigger: 
+trigger:
   batch: true
   branches:
     include:
@@ -11,7 +11,7 @@ trigger:
     - '*'
   paths:
     include:
-    - nginx/*
+    - library/tengine/*
 
 pr:
   branches:
@@ -20,12 +20,12 @@ pr:
     - master
   paths:
     include:
-    - nginx/*
+    - library/tengine/*
 
 variables:
   - group: build
   - name: image
-    value: nginx
+    value: tengine
 
 pool:
   name: Default
@@ -34,4 +34,7 @@ resources:
 - repo: self
 
 stages:
-- template: template/docker-build-pipelines.yml
+- template: ../../.azuredevops/template/docker-build-pipelines.yml
+  parameters:
+    BashfilePath: "library/$(image)/build.sh"
+

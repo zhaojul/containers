@@ -11,7 +11,7 @@ trigger:
     - '*'
   paths:
     include:
-    - tengine/*
+    - library/nginx/*
 
 pr:
   branches:
@@ -20,12 +20,12 @@ pr:
     - master
   paths:
     include:
-    - tengine/*
+    - library/nginx/*
 
 variables:
   - group: build
   - name: image
-    value: tengine
+    value: nginx
 
 pool:
   name: Default
@@ -34,4 +34,7 @@ resources:
 - repo: self
 
 stages:
-- template: template/docker-build-pipelines.yml
+- template: ../../.azuredevops/template/docker-build-pipelines.yml
+  parameters:
+    BashfilePath: "library/$(image)/build.sh"
+ 
